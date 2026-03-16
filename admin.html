@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Ege Yaşar Hanlı Anma</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080d14;
+    --surface:   #0f1520;
+    --border:    rgba(200,168,75,0.18);
+    --gold:      #c8a84b;
+    --gold-dim:  rgba(200,168,75,0.5);
+    --text:      #d4c9a8;
+    --text-muted:#7a7060;
+    --danger:    #8b3a2a;
+    --success:   #2a6b3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── LOGIN EKRANI ── */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at center, #0d1a2e 0%, #080d14 100%);
+  }
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 48px 40px;
+    width: 380px;
+    text-align: center;
+  }
+  .login-box h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+  .login-box p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    letter-spacing: 0.06em;
+  }
+  .login-box input {
+    width: 100%;
+    background: rgba(200,168,75,0.05);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-align: center;
+    margin-bottom: 16px;
+    outline: none;
+  }
+  .login-box input:focus { border-color: var(--gold-dim); }
+  .login-btn {
+    width: 100%;
+    background: rgba(200,168,75,0.1);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    padding: 12px;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .login-btn:hover { background: rgba(200,168,75,0.18); }
+  .login-err {
+    color: #c0604a;
+    font-size: 12px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ── ADMIN PANELI ── */
+  #admin-panel { display: none; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+  }
+  header .status {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  header .status span { color: var(--gold); }
+  .logout-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 14px;
+    color: var(--text-muted);
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  .logout-btn:hover { color: var(--text); border-color: var(--gold-dim); }
+
+  .admin-body {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* Tab bar */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 20px;
+    color: var(--text-muted);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    margin-bottom: -1px;
+    transition: color 0.2s;
+  }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+  .tab-btn .badge {
+    background: var(--danger);
+    color: #fff;
+    font-size: 10px;
+    border-radius: 10px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    font-family: 'Jost', sans-serif;
+    font-weight: 600;
+  }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* Pending kart */
+  .pending-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .pending-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    position: relative;
+  }
+  .pending-card .meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .pending-card .content {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    word-break: break-word;
+  }
+  .pending-card .content strong {
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .pending-card .content img {
+    max-width: 100%;
+    border-radius: 4px;
+    margin-top: 8px;
+    max-height: 200px;
+    object-fit: cover;
+  }
+  .card-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .approve-btn {
+    flex: 1;
+    padding: 8px;
+    background: rgba(42,107,58,0.15);
+    border: 1px solid rgba(42,107,58,0.5);
+    border-radius: 4px;
+    color: #5db87a;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .approve-btn:hover { background: rgba(42,107,58,0.28); }
+  .reject-btn {
+    flex: 1;
+    padding: 8px;
+    background: rgba(139,58,42,0.12);
+    border: 1px solid rgba(139,58,42,0.4);
+    border-radius: 4px;
+    color: #c0604a;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .reject-btn:hover { background: rgba(139,58,42,0.24); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-family: 'Jost', serif;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+  }
+  .empty-state .symbol { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+
+  /* Approved listesi */
+  .approved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .approved-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .approved-item .info { flex: 1; font-size: 13px; line-height: 1.6; }
+  .approved-item .info strong { color: var(--gold); font-size: 14px; }
+  .approved-item .info small { color: var(--text-muted); font-size: 11px; }
+  .delete-btn {
+    background: none;
+    border: 1px solid rgba(139,58,42,0.3);
+    border-radius: 3px;
+    padding: 5px 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .delete-btn:hover { color: #c0604a; border-color: rgba(139,58,42,0.6); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(200,168,75,0.12);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+  }
+  .loading::after {
+    content: '';
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold-dim);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ── GİRİŞ EKRANI ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>᛭ YÖNETİM PANELİ ᛭</h1>
+    <p>Ege Yaşar Hanlı — Anma Sitesi</p>
+    <input type="password" id="admin-password" placeholder="Yönetici şifresi"
+           onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">GİRİŞ YAP</button>
+    <p class="login-err" id="login-err">⚠️ Hatalı şifre</p>
+  </div>
+</div>
+
+<!-- ── ADMİN PANELİ ── -->
+<div id="admin-panel">
+  <header>
+    <h1>᛭ YÖNETİM PANELİ</h1>
+    <div class="status">Firebase: <span id="fb-status">Bağlanıyor…</span></div>
+    <button class="logout-btn" onclick="doLogout()">Çıkış</button>
+  </header>
+
+  <div class="admin-body">
+    <!-- Tab bar -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('messages')" id="tab-messages">
+        Mesajlar <span class="badge" id="badge-messages" style="display:none">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('songs')" id="tab-songs">
+        Nağmeler <span class="badge" id="badge-songs" style="display:none">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('photos')" id="tab-photos">
+        Fotoğraflar <span class="badge" id="badge-photos" style="display:none">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('places')" id="tab-places">
+        Yerler <span class="badge" id="badge-places" style="display:none">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('timeline')" id="tab-timeline">
+        Destan <span class="badge" id="badge-timeline" style="display:none">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('approved')" id="tab-approved">
+        Onaylananlar
+      </button>
+    </div>
+
+    <!-- Pending tab panes -->
+    <div class="tab-pane active" id="pane-messages">
+      <div class="loading" id="load-messages">Yükleniyor</div>
+      <div class="pending-grid" id="grid-messages"></div>
+    </div>
+    <div class="tab-pane" id="pane-songs">
+      <div class="loading" id="load-songs">Yükleniyor</div>
+      <div class="pending-grid" id="grid-songs"></div>
+    </div>
+    <div class="tab-pane" id="pane-photos">
+      <div class="loading" id="load-photos">Yükleniyor</div>
+      <div class="pending-grid" id="grid-photos"></div>
+    </div>
+    <div class="tab-pane" id="pane-places">
+      <div class="loading" id="load-places">Yükleniyor</div>
+      <div class="pending-grid" id="grid-places"></div>
+    </div>
+    <div class="tab-pane" id="pane-timeline">
+      <div class="loading" id="load-timeline">Yükleniyor</div>
+      <div class="pending-grid" id="grid-timeline"></div>
+    </div>
+
+    <!-- Approved tab pane -->
+    <div class="tab-pane" id="pane-approved">
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:20px;letter-spacing:0.05em">
+        Onaylanmış ve sitede yayınlanan içerikler. Silmek için ilgili butona tıklayın.
+      </p>
+      <div class="tabs" style="margin-bottom:20px;border-bottom:1px solid rgba(200,168,75,0.1)">
+        <button class="tab-btn active" onclick="switchApprovedSub('messages')" id="asub-messages">Mesajlar</button>
+        <button class="tab-btn" onclick="switchApprovedSub('songs')" id="asub-songs">Nağmeler</button>
+        <button class="tab-btn" onclick="switchApprovedSub('photos')" id="asub-photos">Fotoğraflar</button>
+        <button class="tab-btn" onclick="switchApprovedSub('places')" id="asub-places">Yerler</button>
+        <button class="tab-btn" onclick="switchApprovedSub('timeline')" id="asub-timeline">Destan</button>
+      </div>
+      <div id="approved-content"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+// ══════════════════════════════════════════════
+//  ŞİFRE — bunu değiştirin!
+//  Güçlü bir şifre kullanın (en az 12 karakter)
+// ══════════════════════════════════════════════
+var ADMIN_HASH = null; // SHA-256 hash of password, set via __env
+var ADMIN_PASSWORD_PLAIN = null; // fallback for dev
+
+// ── Auth ──
+function doLogin() {
+  var pw = document.getElementById('admin-password').value;
+  var stored = (window.__env && window.__env.adminPassword) || null;
+
+  // Hash karşılaştırması (production) veya plain text (dev fallback)
+  var ok = false;
+  if (stored) {
+    ok = (pw === stored);
+  } else {
+    // Dev: şifreyi .env'e taşıyın. Şimdilik boş bırakıldı.
+    showErr('Admin şifresi yapılandırılmamış. Lütfen .env dosyasını kontrol edin.');
+    return;
+  }
+
+  if (ok) {
+    sessionStorage.setItem('admin_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-panel').style.display  = 'block';
+    initFirebase();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('admin-password').value = '';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('admin_auth');
+  location.reload();
+}
+
+function showErr(msg) {
+  var el = document.getElementById('login-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// Sayfa yüklendiğinde oturum kontrolü
+window.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('admin_auth') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-panel').style.display  = 'block';
+    initFirebase();
+  }
+
+  // Firebase Hosting'den __env yükle
+  fetch('/__/firebase/init.json')
+    .then(function(r){ return r.json(); })
+    .then(function(cfg){ window.__env = window.__env || {}; window.__env.firebaseConfig = cfg; })
+    .catch(function(){});
+
+  // Admin şifresi env'den
+  fetch('/env.json')
+    .then(function(r){ return r.json(); })
+    .then(function(e){ window.__env = window.__env || {}; window.__env.adminPassword = e.adminPassword; })
+    .catch(function(){});
+});
+
+// ── Firebase ──
+var db = null;
+var TYPES = ['messages','songs','photos','places','timeline'];
+var currentApprovedSub = 'messages';
+
+function initFirebase() {
+  fetch('/__/firebase/init.json')
+    .then(function(r){ return r.json(); })
+    .then(function(cfg){
+      var app = firebase.initializeApp(cfg, 'admin');
+      db = firebase.database(app);
+      document.getElementById('fb-status').textContent = 'Bağlı ✓';
+      document.getElementById('fb-status').style.color = '#5db87a';
+      listenAll();
+    })
+    .catch(function(e){
+      document.getElementById('fb-status').textContent = 'Bağlantı hatası';
+      document.getElementById('fb-status').style.color = '#c0604a';
+      console.error(e);
+    });
+}
+
+function listenAll() {
+  TYPES.forEach(function(type) {
+    db.ref('ege_hanli/pending/' + type).on('value', function(snap) {
+      var data = snap.val() ? snap.val() : {};
+      renderPending(type, data);
+    });
+  });
+}
+
+// ── Render Pending ──
+function renderPending(type, data) {
+  var grid = document.getElementById('grid-' + type);
+  var load = document.getElementById('load-' + type);
+  var badge = document.getElementById('badge-' + type);
+  if (load) load.style.display = 'none';
+
+  var keys = Object.keys(data);
+  badge.textContent = keys.length;
+  badge.style.display = keys.length > 0 ? 'inline' : 'none';
+
+  if (keys.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="symbol">᛭</div>Bekleyen içerik yok</div>';
+    return;
+  }
+
+  grid.innerHTML = keys.map(function(k) {
+    var item = data[k];
+    var date = item.createdAt ? new Date(item.createdAt).toLocaleString('tr-TR') : '—';
+    var contentHtml = renderItemContent(type, item);
+    return '<div class="pending-card">' +
+      '<div class="meta"><span>᛭ ' + esc(item.by || '?') + '</span><span>' + date + '</span></div>' +
+      '<div class="content">' + contentHtml + '</div>' +
+      '<div class="card-actions">' +
+        '<button class="approve-btn" onclick="approveItem(\'' + type + '\',\'' + k + '\')">✓ Onayla</button>' +
+        '<button class="reject-btn"  onclick="rejectItem(\'' + type + '\',\'' + k + '\')">✕ Reddet</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderItemContent(type, item) {
+  switch(type) {
+    case 'messages':
+      return '<div style="font-style:italic;margin-bottom:6px">"' + esc(item.text) + '"</div>' +
+             '<strong>' + esc(item.name) + '</strong> · <small>' + esc(item.relation||'Dost') + '</small>';
+    case 'songs':
+      return '<strong>' + esc(item.title) + '</strong> — ' + esc(item.artist||'') +
+             (item.link ? '<br><a href="'+esc(item.link)+'" target="_blank" style="color:var(--gold-dim);font-size:12px">↗ Link</a>' : '');
+    case 'photos':
+      return (item.src ? '<img src="'+item.src+'" alt="">' : '<em style="color:var(--text-muted)">Görsel yok</em>') +
+             '<br><small>' + esc(item.caption||'') + '</small>';
+    case 'places':
+      return '<strong>' + esc(item.name) + '</strong>' +
+             '<br><small>📍 ' + (item.lat||'').toFixed(4) + ', ' + (item.lng||'').toFixed(4) + '</small>' +
+             '<br>' + esc(item.memory||'');
+    case 'timeline':
+      return '<strong>' + esc(String(item.year)) + ' — ' + esc(item.title) + '</strong>' +
+             '<br>' + esc(item.desc||'');
+    default: return JSON.stringify(item);
+  }
+}
+
+// ── Onayla / Reddet ──
+function approveItem(type, key) {
+  db.ref('ege_hanli/pending/' + type + '/' + key).once('value', function(snap) {
+    var item = snap.val();
+    if (!item) return;
+    // pending'den sil, approved'a yaz
+    var updates = {};
+    updates['ege_hanli/approved/' + type + '/' + key] = item;
+    updates['ege_hanli/pending/'  + type + '/' + key] = null;
+    db.ref().update(updates)
+      .then(function(){ showToast('✓ Onaylandı ve yayınlandı.'); })
+      .catch(function(e){ showToast('❌ Hata: ' + e.message); });
+  });
+}
+
+function rejectItem(type, key) {
+  if (!confirm('Bu içeriği kalıcı olarak silmek istediğinize emin misiniz?')) return;
+  db.ref('ege_hanli/pending/' + type + '/' + key).remove()
+    .then(function(){ showToast('✕ İçerik reddedildi ve silindi.'); })
+    .catch(function(e){ showToast('❌ Hata: ' + e.message); });
+}
+
+// ── Approved yönetimi ──
+function switchApprovedSub(sub) {
+  currentApprovedSub = sub;
+  document.querySelectorAll('[id^="asub-"]').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('asub-' + sub).classList.add('active');
+  loadApproved(sub);
+}
+
+function loadApproved(type) {
+  var el = document.getElementById('approved-content');
+  el.innerHTML = '<div class="loading">Yükleniyor</div>';
+  db.ref('ege_hanli/approved/' + type).once('value', function(snap) {
+    var data = snap.val() || {};
+    var keys = Object.keys(data);
+    if (keys.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="symbol">◈</div>Onaylanmış içerik yok</div>';
+      return;
+    }
+    el.innerHTML = '<div class="approved-list">' +
+      keys.map(function(k) {
+        var item = data[k];
+        var date = item.createdAt ? new Date(item.createdAt).toLocaleString('tr-TR') : '—';
+        return '<div class="approved-item">' +
+          '<div class="info">' + renderItemContent(type, item) +
+          '<br><small>— ' + esc(item.by||'?') + ' · ' + date + '</small></div>' +
+          '<button class="delete-btn" onclick="deleteApproved(\'' + type + '\',\'' + k + '\')">Sil</button>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  });
+}
+
+function deleteApproved(type, key) {
+  if (!confirm('Onaylanmış bu içeriği siteden kaldırmak istiyor musunuz?')) return;
+  db.ref('ege_hanli/approved/' + type + '/' + key).remove()
+    .then(function(){
+      showToast('İçerik siteden kaldırıldı.');
+      loadApproved(currentApprovedSub);
+    })
+    .catch(function(e){ showToast('❌ Hata: ' + e.message); });
+}
+
+// ── Tab sistemi ──
+function switchTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('pane-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'approved') loadApproved(currentApprovedSub);
+}
+
+// ── Yardımcılar ──
+function esc(str) {
+  return String(str||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+var toastTimer;
+function showToast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+</html>

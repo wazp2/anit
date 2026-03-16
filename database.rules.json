@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "ege_hanli": {
+      "approved": {
+        ".read": true,
+        ".write": false
+      },
+      "pending": {
+        ".read": false,
+        "songs": {
+          ".write": true,
+          "$item": {
+            ".validate": "newData.hasChildren(['title','by','createdAt']) && newData.child('title').val().length <= 200 && newData.child('by').val().length <= 100"
+          }
+        },
+        "photos": {
+          ".write": true,
+          "$item": {
+            ".validate": "newData.hasChildren(['by','createdAt']) && newData.child('by').val().length <= 100"
+          }
+        },
+        "messages": {
+          ".write": true,
+          "$item": {
+            ".validate": "newData.hasChildren(['text','name','createdAt']) && newData.child('text').val().length <= 1000 && newData.child('name').val().length <= 100"
+          }
+        },
+        "places": {
+          ".write": true,
+          "$item": {
+            ".validate": "newData.hasChildren(['name','lat','lng','by','createdAt']) && newData.child('name').val().length <= 200"
+          }
+        },
+        "timeline": {
+          ".write": true,
+          "$item": {
+            ".validate": "newData.hasChildren(['year','title','by','createdAt']) && newData.child('title').val().length <= 200"
+          }
+        }
+      }
+    }
+  }
+}
