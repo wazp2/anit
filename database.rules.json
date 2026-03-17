@@ -1,40 +1,70 @@
 {
   "rules": {
+    ".read": false,
+    ".write": false,
     "ege_hanli": {
+      "settings": {
+        "autoApprove": {
+          ".read": true,
+          ".write": "auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com'"
+        }
+      },
       "approved": {
         ".read": true,
-        ".write": false
-      },
-      "pending": {
-        ".read": false,
+        "hero": {
+          ".write": "auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com'"
+        },
+        "messages": {
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || (!data.exists() && root.child('ege_hanli/settings/autoApprove').val() === true)"
+          }
+        },
         "songs": {
-          ".write": true,
-          "$item": {
-            ".validate": "newData.hasChildren(['title','by','createdAt']) && newData.child('title').val().length <= 200 && newData.child('by').val().length <= 100"
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || (!data.exists() && root.child('ege_hanli/settings/autoApprove').val() === true)"
           }
         },
         "photos": {
-          ".write": true,
-          "$item": {
-            ".validate": "newData.hasChildren(['by','createdAt']) && newData.child('by').val().length <= 100"
-          }
-        },
-        "messages": {
-          ".write": true,
-          "$item": {
-            ".validate": "newData.hasChildren(['text','name','createdAt']) && newData.child('text').val().length <= 1000 && newData.child('name').val().length <= 100"
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || (!data.exists() && root.child('ege_hanli/settings/autoApprove').val() === true)"
           }
         },
         "places": {
-          ".write": true,
-          "$item": {
-            ".validate": "newData.hasChildren(['name','lat','lng','by','createdAt']) && newData.child('name').val().length <= 200"
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || (!data.exists() && root.child('ege_hanli/settings/autoApprove').val() === true)"
           }
         },
         "timeline": {
-          ".write": true,
-          "$item": {
-            ".validate": "newData.hasChildren(['year','title','by','createdAt']) && newData.child('title').val().length <= 200"
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || (!data.exists() && root.child('ege_hanli/settings/autoApprove').val() === true)"
+          }
+        }
+      },
+      "pending": {
+        ".read": "auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com'",
+        "messages": {
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || !data.exists()"
+          }
+        },
+        "songs": {
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || !data.exists()"
+          }
+        },
+        "photos": {
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || !data.exists()"
+          }
+        },
+        "places": {
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || !data.exists()"
+          }
+        },
+        "timeline": {
+          "$id": {
+            ".write": "(auth != null && auth.token.email_verified === true && auth.token.email === 'youngvoicesofthesinop@gmail.com') || !data.exists()"
           }
         }
       }

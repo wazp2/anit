@@ -2,8 +2,8 @@
 // ════════════════════════════════════════════
 //  generate_env.js
 //  Deploy öncesi çalıştırın: node generate_env.js
-//  .env → env.json (sadece adminPassword — Firebase config __/firebase/init.json'dan geliyor)
-//  env.json Firebase Hosting'e yüklenir ama .gitignore'da olmalı
+//  Legacy helper. env.json artık secret taşımamalı.
+//  Gerekirse yalnızca public adminEmail bilgisi üretir.
 // ════════════════════════════════════════════
 
 const fs   = require('fs');
@@ -25,14 +25,9 @@ lines.forEach(line => {
   env[key.trim()] = rest.join('=').trim();
 });
 
-if (!env.ADMIN_PASSWORD || env.ADMIN_PASSWORD === 'buraya-guclu-sifre-yazin') {
-  console.error('❌ ADMIN_PASSWORD .env dosyasında ayarlanmamış!');
-  process.exit(1);
-}
-
-// env.json oluştur — sadece adminPassword
+// env.json oluştur — sadece public adminEmail
 const output = {
-  adminPassword: env.ADMIN_PASSWORD
+  adminEmail: env.ADMIN_EMAIL || ''
 };
 
 fs.writeFileSync(
@@ -41,7 +36,7 @@ fs.writeFileSync(
 );
 
 console.log('✓ env.json oluşturuldu.');
-console.log('  adminPassword: [gizli]');
+console.log('  adminEmail:', output.adminEmail || '[bos]');
 console.log('');
 console.log('Şimdi deploy edebilirsiniz:');
 console.log('  firebase deploy');
